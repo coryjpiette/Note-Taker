@@ -1,22 +1,37 @@
+const express = require('express');
+const path = require('path');
+const { clog } = require('./middleware/clog');
+const api = require('./routes/index.js');
 
-// Dependencies
-const express = require("express");
-const fs = require("fs");
+const PORT = process.env.port || 3001;
 
+const app = express();
 
-//Express App
-var app = express();
-var PORT = process.env.PORT || 8080
+// Import custom middleware, "cLog"
+app.use(clog);
 
-//data parsing
-app.use(express.urlencoded({ extended: true }));
+// Middleware for parsing JSON and urlencoded form data
 app.use(express.json());
-app.use("/assets", express.static("./assets"));
+app.use(express.urlencoded({ extended: true }));
+app.use('/api', api);
 
-require("./routing/html-routes")(app);
-require("./routing/api-routes")(app);
+app.use(express.static('public'));
 
-// server listening
-app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-});
+// GET Route for homepage
+app.get('/', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/index.html'))
+);
+
+// GET Route for feedback page
+app.get('/feedback', (req, res) =>
+  res.sendFile(path.join(__dirname, '/public/pages/feedback.html'))
+);
+
+// Wildcard route to direct users to a 404 page
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public/pages/404.html'))
+);
+
+app.listen(PORT, () =>
+  console.log(`App listening at http://localhost:${PORT} 🚀`)
+);
