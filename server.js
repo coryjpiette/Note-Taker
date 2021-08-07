@@ -43,7 +43,6 @@ app.post('/api/notes', (req, res) => {
     const newNote = {
      title,
       text,
-      topic,
       id: uuidv4(),
     };
 
