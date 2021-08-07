@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
-// Import custom middleware, "cLog"
+// Import custom middleware, "clog"
 app.use(clog);
 
 // Middleware for parsing JSON and urlencoded form data
@@ -29,6 +29,9 @@ app.get('/notes', (req, res) =>
   res.sendFile(path.join(__dirname, '/public/notes.html'))
 );
 
+app.get('/api/notes', (req, res) => 
+res.sendFile(path.join(__dirname, '/db/db.json'))
+);
 
 // POST Route for new note
 app.post('/api/notes', (req, res) => {
@@ -44,12 +47,43 @@ app.post('/api/notes', (req, res) => {
       id: uuidv4(),
     };
 
-    readAndAppend(newTip, './db/notes.json');
-    res.json(`Note added successfully 🚀`);
+    // Obtain existing reviews
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        // Convert string into JSON object
+        const parsedNotes = JSON.parse(data);
+
+        // Add a new review
+        parsedNotes.push(newNote);
+
+        // Write updated reviews back to the file
+        fs.writeFile(
+          './db/db.json',
+          JSON.stringify(parsedNotes, null, 4),
+          (writeErr) =>
+            writeErr
+              ? console.error(writeErr)
+              : console.info('Successfully updated Notes!')
+        );
+      }
+    });
+
+    const response = {
+      status: 'success',
+      body: newNote,
+    };
+
+    console.log(response);
+    res.json(response);
   } else {
-    res.error('Error in adding note');
+    res.json('Error in posting notes');
   }
-});
+
+  
+  }
+);
 
 
 app.listen(PORT, () =>
