@@ -1,3 +1,3 @@
 # Note-Taker
 Note Taker
-![Alt Text](https://coryjpiette/Note-Taker/main/note-taker.gif)
+![Alt Text](https://coryjpiette/Note-Taker/blob/main/note-taker.gif)
